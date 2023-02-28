@@ -3,6 +3,7 @@
 Ejemplo para usar las notificacines de Windows10/11
 
 Extraido de STD Foundation Classes - Windows Notification Utility
+https://sourceforge.net/projects/stdfndclass/files/Applications/PowerBuilder/Notification/
 
 Se puede extraer el objeto n_cst_systemtray e integrar directamente en cualquier aplicación
 o se pude usar esta aplación pasandole los parámetros:
