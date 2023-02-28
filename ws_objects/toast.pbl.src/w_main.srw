@@ -195,11 +195,11 @@ IF  Len ( ls_command ) > 0 THEN
 	
 
 	CHOOSE CASE ls_Icon
-		CASE "StopSign!"
+		CASE "StopSign"
 			le_Icon = StopSign!
-		CASE "Information!"
+		CASE "Information"
 			le_icon = Information!
-		CASE "Exclamation!"
+		CASE "Exclamation"
 			le_icon = Exclamation!
 		CASE ELSE
 			le_icon = None!
@@ -271,7 +271,7 @@ end event
 type ddlb_icon from dropdownlistbox within w_main
 integer x = 576
 integer y = 732
-integer width = 549
+integer width = 430
 integer height = 400
 integer taborder = 30
 integer textsize = -10
@@ -282,7 +282,7 @@ fontfamily fontfamily = swiss!
 string facename = "Tahoma"
 long textcolor = 33554432
 boolean sorted = false
-string item[] = {"StopSign!","Information!","None!","Exclamation!"}
+string item[] = {"StopSign","Information","None","Exclamation"}
 borderstyle borderstyle = stylelowered!
 end type
 
@@ -438,13 +438,13 @@ ls_msg			=	sle_msg.text
 li_sleep			=	integer(em_sleep.text)
 
 CHOOSE CASE ddlb_icon.text
-	CASE "StopSign!"
+	CASE "StopSign"
 		le_icon = StopSign!
-	CASE "Information!"
+	CASE "Information"
 		le_icon = Information!
-	CASE "None!"
+	CASE "None"
 		le_icon = None!
-	CASE "Exclamation!"
+	CASE "Exclamation"
 		le_icon = Exclamation!
 END CHOOSE
 
