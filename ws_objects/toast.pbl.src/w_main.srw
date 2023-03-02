@@ -112,7 +112,7 @@ SharedObjectGet("thread1", ln_shared1)
 in_systemtray.of_add_to_systemtray (this )															
 in_systemtray.of_set_notification_message (this, as_title, as_msg, a_icon)
 
-//Usamos un Objeto compartido para poder eliminar la notificaciñon pasados unos segndos en un hilo distinto
+//Usamos un Objeto compartido para poder eliminar la notificación pasados unos segndos en un hilo distinto
 ln_shared1.POST  of_delete_from_systemtray ( ai_MessageBoxTimeout, in_callback )	
 			
 SharedObjectUnRegister("thread1")
