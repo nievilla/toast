@@ -9,13 +9,14 @@ global type n_cst_systemtray_shared from nonvisualobject
 end type
 global n_cst_systemtray_shared n_cst_systemtray_shared
 
+type variables
+
+end variables
 forward prototypes
 public subroutine of_delete_from_systemtray (integer ai_messageboxtimeout, n_cst_systemtray_callback a_callback)
 end prototypes
 
-public subroutine of_delete_from_systemtray (integer ai_messageboxtimeout, n_cst_systemtray_callback a_callback); IF w_main.in_systemtray.of_get_systemtray_active()=FALSE THEN RETURN
-	
-IF ai_MessageBoxTimeout > 0 THEN
+public subroutine of_delete_from_systemtray (integer ai_messageboxtimeout, n_cst_systemtray_callback a_callback);IF ai_MessageBoxTimeout > 0 THEN
 	sleep(ai_MessageBoxTimeout)
 END IF   
 
