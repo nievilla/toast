@@ -336,7 +336,6 @@ CONSTANT long PBM_CUSTOM75				= 1024 + 74
 Boolean ib_HideWindow = FALSE
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------
 end variables
-
 forward prototypes
 public function boolean of_add_to_systemtray (window ao_window)
 public function boolean of_add_to_systemtray (window ao_window, string as_imagename)

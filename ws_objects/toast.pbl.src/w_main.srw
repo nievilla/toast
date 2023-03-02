@@ -67,11 +67,14 @@ type prototypes
 end prototypes
 
 type variables
-
+n_cst_systemtray in_systemtray
+n_cst_systemtray_callback in_callback
 end variables
 
 forward prototypes
 public subroutine wf_version (statictext ast_version, statictext ast_patform)
+public subroutine wf_set_notification_message (string as_title, string as_msg, icon a_icon, integer ai_messageboxtimeout)
+public subroutine wf_process_command (string as_command)
 end prototypes
 
 public subroutine wf_version (statictext ast_version, statictext ast_patform);String ls_version, ls_platform
@@ -92,6 +95,88 @@ ls_platform += " Bits"
 
 ast_version.text=ls_version
 ast_patform.text=ls_platform
+
+end subroutine
+
+public subroutine wf_set_notification_message (string as_title, string as_msg, icon a_icon, integer ai_messageboxtimeout);n_cst_systemtray_shared ln_shared1
+
+SharedObjectRegister("n_cst_systemtray_shared","thread1")
+SharedObjectGet("thread1", ln_shared1)
+
+
+ //Si hay en pantalla una Noficación la elimino.
+ IF in_systemtray.of_get_systemtray_active()=TRUE THEN
+	in_systemtray.of_delete_from_systemtray (this, FALSE )
+ END IF
+ 
+in_systemtray.of_add_to_systemtray (this )															
+in_systemtray.of_set_notification_message (this, as_title, as_msg, a_icon)
+
+//Usamos un Objeto compartido para poder eliminar la notificaciñon pasados unos segndos en un hilo distinto
+ln_shared1.POST  of_delete_from_systemtray ( ai_MessageBoxTimeout, in_callback )	
+			
+SharedObjectUnRegister("thread1")
+end subroutine
+
+public subroutine wf_process_command (string as_command);String		ls_time			=	"Time="																		// YES=>Work Vars
+String		ls_name			=	"Name="
+String		ls_icon			=	"Icon="
+String		ls_msg			=	"Msg="
+Int			li_sleep			=	0
+Int			li_pos
+Int			li_pos2
+icon le_icon
+
+	
+li_pos		=	POS ( as_command, ls_time, 1)																// YES=>Get position of "Time="
+li_pos		+=  Len ( ls_time )																					// Adjust position
+li_pos2	=	POS ( as_command, ls_name, 1)																// Get position of "Name="
+li_pos2	--																											// Adjust position
+	
+li_sleep 	=	Integer ( mid ( as_command, li_pos, ( li_pos2 - li_pos ) ) )								// Extract "time" value
+	
+li_pos		=	POS ( as_command, ls_name , 1)																// Get position of "Name="
+li_pos		+=  Len ( ls_name )																					// Adjust position
+li_pos2	=	POS ( as_command, ls_msg, 1)																	// Get position of "Msg="
+li_pos2	--																											// Adjust position
+	
+ls_name 	=	Mid ( as_command, li_pos, ( li_pos2 - li_pos ) ) 											// Extract "name" value
+	
+
+li_pos		=	POS ( as_command, ls_msg , 1)																// Get position of "Msg="
+li_pos		+=  Len ( ls_msg )																						// Compute end of Commandline
+//li_pos2	=	LEN ( as_command ) + 1																			// Adjust position
+li_pos2	=	POS ( as_command, ls_icon, 1)																	// Get position of "Msg="
+li_pos2	--			
+	
+ls_msg 	=	Mid ( as_command, li_pos, ( li_pos2 - li_pos ) ) 											// Extract "msg" value
+	
+li_pos		=	POS ( as_command, ls_icon , 1)																// Get position of "Icon="
+li_pos		+=  Len ( ls_icon )																						// Compute end of Commandline
+li_pos2	=	LEN ( as_command ) + 1																			// Adjust position
+
+ls_Icon	=	Mid ( as_command, li_pos, ( li_pos2 - li_pos ) ) 											// Extract "icon" value
+	
+
+CHOOSE CASE ls_Icon
+		CASE "StopSign"
+		le_Icon = StopSign!
+	CASE "Information"
+		le_icon = Information!
+		CASE "Exclamation"
+		le_icon = Exclamation!
+	CASE ELSE
+		le_icon = None!
+END CHOOSE
+
+	
+wf_set_notification_message (ls_name, ls_msg, le_icon, li_sleep)				
+	
+CLOSE ( THIS )																							
+																										
+
+
+
 
 end subroutine
 
@@ -146,74 +231,19 @@ destroy(this.st_platform)
 destroy(this.r_2)
 end on
 
-event open;String		ls_time			=	"Time="																		// YES=>Work Vars
-String		ls_name			=	"Name="
-String		ls_icon			=	"Icon="
-String		ls_msg			=	"Msg="
-String		ls_command		=	""
-Int			li_sleep			=	0
-Int			li_pos
-Int			li_pos2
-icon le_icon
+event open;String		ls_command		=	""
+
+
+// Para el manejo de notificaciones
+in_systemtray	=	CREATE  n_cst_systemtray												
+in_callback = Create n_cst_systemtray_callback
+in_callback.of_register(this)
+
 
 ls_command = Message.StringParm
 
 IF  Len ( ls_command ) > 0 THEN		
-	IF  IsValid (go_systemtray) = FALSE THEN																// NO=>System Tray active?
-		go_systemtray	=	CREATE  n_cst_systemtray													// NO=>Instantiate it!
-		go_systemtray.ib_HideWindow  = TRUE
-	END IF
-
-	li_pos		=	POS ( ls_command, ls_time, 1)																// YES=>Get position of "Time="
-	li_pos		+=  Len ( ls_time )																					// Adjust position
-	li_pos2	=	POS ( ls_command, ls_name, 1)																// Get position of "Name="
-	li_pos2	--																											// Adjust position
-	
-	li_sleep 	=	Integer ( mid ( ls_command, li_pos, ( li_pos2 - li_pos ) ) )								// Extract "time" value
-	
-	li_pos		=	POS ( ls_command, ls_name , 1)																// Get position of "Name="
-	li_pos		+=  Len ( ls_name )																					// Adjust position
-	li_pos2	=	POS ( ls_command, ls_msg, 1)																	// Get position of "Msg="
-	li_pos2	--																											// Adjust position
-	
-	ls_name 	=	Mid ( ls_command, li_pos, ( li_pos2 - li_pos ) ) 											// Extract "name" value
-	
-
-	li_pos		=	POS ( ls_command, ls_msg , 1)																// Get position of "Msg="
-	li_pos		+=  Len ( ls_msg )																						// Compute end of Commandline
-	//li_pos2	=	LEN ( ls_command ) + 1																			// Adjust position
-	li_pos2	=	POS ( ls_command, ls_icon, 1)																	// Get position of "Msg="
-	li_pos2	--			
-	
-	ls_msg 	=	Mid ( ls_command, li_pos, ( li_pos2 - li_pos ) ) 											// Extract "msg" value
-	
-	li_pos		=	POS ( ls_command, ls_icon , 1)																// Get position of "Icon="
-	li_pos		+=  Len ( ls_icon )																						// Compute end of Commandline
-	li_pos2	=	LEN ( ls_command ) + 1																			// Adjust position
-	
-	ls_Icon	=	Mid ( ls_command, li_pos, ( li_pos2 - li_pos ) ) 											// Extract "icon" value
-	
-
-	CHOOSE CASE ls_Icon
-		CASE "StopSign"
-			le_Icon = StopSign!
-		CASE "Information"
-			le_icon = Information!
-		CASE "Exclamation"
-			le_icon = Exclamation!
-		CASE ELSE
-			le_icon = None!
-	END CHOOSE
-
-	go_systemtray.of_add_to_systemtray (THIS )			
-	go_systemtray.of_set_notification_message (THIS, ls_name, ls_msg, le_icon)				// Send O/S Notification!
-	IF	li_sleep > 0 THEN																							// Sleep required?
-		Sleep ( li_sleep )																								// YES=>Sleep the App
-	END IF
-	go_systemtray.of_delete_from_systemtray ( THIS, FALSE )												// Remove from SysTray!
-	
-	CLOSE ( THIS )																									// Close App!
-	RETURN																											// Return to O/S
+	wf_process_command(ls_command)						
 ELSE
 	ddlb_icon.SelectItem(2)
 	wf_version(st_myversion, st_platform)
@@ -224,9 +254,12 @@ END IF
 
 end event
 
-event closequery;IF  IsValid (go_systemtray) = 	TRUE THEN															
-	IF go_systemtray.of_get_systemtray_active()=TRUE THEN RETURN 1
-END IF
+event closequery; IF in_systemtray.of_get_systemtray_active()=TRUE THEN
+	in_systemtray.of_delete_from_systemtray (this, FALSE )
+ END IF
+destroy in_systemtray										
+destroy in_callback
+
 end event
 
 type cb_1 from commandbutton within w_main
@@ -244,7 +277,12 @@ string facename = "Tahoma"
 string text = "External Test"
 end type
 
-event clicked;//LLamamos a la aplicación por Comandos
+event clicked; //Si hay en pantalla una Noficación la elimino.
+ IF in_systemtray.of_get_systemtray_active()=TRUE THEN
+	in_systemtray.of_delete_from_systemtray (PARENT, FALSE )
+ END IF
+
+//LLamamos a la aplicación por Comandos
 
 String		ls_name				
 String		ls_msg			
@@ -448,27 +486,7 @@ CHOOSE CASE ddlb_icon.text
 		le_icon = Exclamation!
 END CHOOSE
 
-IF  IsValid (go_systemtray) = FALSE THEN																// NO=>System Tray active?
-	go_systemtray	=	CREATE  n_cst_systemtray													// NO=>Instantiate it!
-	go_systemtray.ib_HideWindow = FALSE															//Not Necessary Default is FALSE
-ELSE
-	IF go_systemtray.of_get_systemtray_active()=TRUE THEN RETURN
-END IF
-
-go_systemtray.of_add_to_systemtray (parent )															// Add App to SysTray!
-	
-go_systemtray.of_set_notification_message (PARENT, ls_name, ls_msg, le_icon)				// Send O/S Notification!
-	
-IF	li_sleep > 0 THEN																							// Sleep required?
-	lt_time1 = now()
-	DO 
-		yield()
-		lt_time2 =  now()
-	LOOP WHILE SecondsAfter ( lt_time1, lt_time2 ) < li_sleep
-END IF
-
-go_systemtray.of_delete_from_systemtray ( parent, FALSE )												// Remove from SysTray!	
-
+wf_set_notification_message (ls_name, ls_msg, le_icon, li_sleep)			
 
 end event
 

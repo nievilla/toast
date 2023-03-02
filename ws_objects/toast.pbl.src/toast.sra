@@ -11,7 +11,6 @@ global message message
 end forward
 
 global variables
-n_cst_systemtray go_systemtray
 string gs_appdir
 
 end variables
@@ -39,6 +38,7 @@ type prototypes
 //Funcion para tomar el directorio de la aplicacion  -64Bits 
 FUNCTION	uLong	GetModuleFileName ( uLong lhModule, ref string sFileName, ulong nSize )  LIBRARY "Kernel32.dll" ALIAS FOR "GetModuleFileNameW"
 end prototypes
+
 type variables
 
 end variables

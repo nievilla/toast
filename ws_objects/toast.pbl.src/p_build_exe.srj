@@ -5,12 +5,14 @@ COM:RSRSYSTEM
 DES:Toast Notification's Utility
 CPY:Ramón San Félix Ramón
 PRD:Toast
-PVS:2022.0.1892.2
-PVN:2022,0,1892,2
-FVS:2022.0.1892.2
-FVN:2022,0,1892,2
+PVS:2022.0.1892.3
+PVN:2022,0,1892,3
+FVS:2022.0.1892.3
+FVN:2022,0,1892,3
 MAN:0,asInvoker,0
 PBD:toast.pbl,,1
 OBJ:C:\proyecto pw2022\Blog\PowerBuilder\toast\toast.pbl,w_main,w
 OBJ:C:\proyecto pw2022\Blog\PowerBuilder\toast\toast.pbl,toast,a
+OBJ:C:\proyecto pw2022\Blog\PowerBuilder\toast\toast.pbl,n_cst_systemtray_shared,u
+OBJ:C:\proyecto pw2022\Blog\PowerBuilder\toast\toast.pbl,n_cst_systemtray_callback,u
 OBJ:C:\proyecto pw2022\Blog\PowerBuilder\toast\toast.pbl,n_cst_systemtray,u
