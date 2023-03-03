@@ -14,6 +14,7 @@ global variables
 string gs_appdir
 
 end variables
+
 global type toast from application
 string appname = "toast"
 string themepath = "C:\Program Files (x86)\Appeon\PowerBuilder 22.0\IDE\theme"
@@ -77,6 +78,6 @@ end if
 
 gs_appdir=left(ls_path, len(ls_path) - (len(ls_ExeFile) + 1))  
 
-OpenWithParm(w_main, commandline)
+Open(w_main)
 end event
 
